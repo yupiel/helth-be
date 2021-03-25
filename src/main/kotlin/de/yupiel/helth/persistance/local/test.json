@@ -1,0 +1,32 @@
+[
+  {
+    "id": "274ea64e-5765-46e6-b7f1-9123557445d4",
+    "type": "DRINK_WATER",
+    "creationDate": "2021-03-24"
+  },
+  {
+    "id": "0e1d87fd-1ba5-41d5-9f8a-321a4f52d507",
+    "type": "DRINK_WATER",
+    "creationDate": "2021-03-24"
+  },
+  {
+    "id": "ae23daae-7cef-4752-b951-a73d899348d9",
+    "type": "DRINK_WATER",
+    "creationDate": "2021-03-24"
+  },
+  {
+    "id": "5d190ada-0101-4650-99a3-28bcf272e027",
+    "type": "DRINK_WATER",
+    "creationDate": "2021-03-24"
+  },
+  {
+    "id": "13acbdd6-42ea-44c5-8328-7db645dc094f",
+    "type": "DRINK_WATER",
+    "creationDate": "2021-03-24"
+  },
+  {
+    "id": "e0326716-c93f-4b2b-98ca-3f5b763e633a",
+    "type": "DRINK_WATER",
+    "creationDate": "2021-03-24"
+  }
+]
