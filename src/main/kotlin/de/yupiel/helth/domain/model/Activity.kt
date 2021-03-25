@@ -4,18 +4,20 @@ import java.time.LocalDate
 import java.util.*
 
 class Activity(_type: ActivityType, _creationDate: LocalDate) {
-    var id: UUID? = null
+    var id: UUID
     private set
-    var type: ActivityType? = null
+    var type: ActivityType
     private set
-    var creationDate: LocalDate? = null
+    var creationDate: LocalDate
     private set
 
     init {
+        this.id = UUID.randomUUID()
         this.type = _type
         this.creationDate = _creationDate
     }
 
+    //Used for loading an Activity from Repository EXCLUSIVELY
     constructor(id: UUID, type: ActivityType, creationDate: LocalDate) : this(type, creationDate) {
         this.id = id
     }
