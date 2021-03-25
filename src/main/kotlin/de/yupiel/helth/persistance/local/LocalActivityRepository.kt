@@ -5,13 +5,16 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import de.yupiel.helth.domain.integration.IActivityRepository
 import de.yupiel.helth.domain.model.Activity
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 import java.io.File
 import java.time.LocalDate
 import java.util.*
 
-@Component
-class LocalActivityRepository() : IActivityRepository {
+@Repository
+@Profile("local")
+class LocalActivityRepository : IActivityRepository {
     override fun findById(id: UUID): Activity? {
         val jsonOfFile = Parser.default()
             .parse("./src/main/kotlin/de/yupiel/helth/persistance/local/test.json") as JsonArray<JsonObject>
@@ -41,7 +44,7 @@ class LocalActivityRepository() : IActivityRepository {
             JsonObject(
                 mapOf(
                     "id" to newActivity.id.toString(),
-                    "type" to newActivity.type!!,
+                    "type" to newActivity.type,
                     "creationDate" to newActivity.creationDate.toString()
                 )
             )

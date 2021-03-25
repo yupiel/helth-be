@@ -1,20 +1,30 @@
 package de.yupiel.helth.integration.web
 
+import com.beust.klaxon.JsonObject
 import de.yupiel.helth.domain.application.ActivityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@RequestMapping("/user/{username}/activities")
+@RequestMapping("/users/{userID}/activities")
 class ActivityController() {
     @Autowired
     lateinit var activityService: ActivityService
 
-    @GetMapping("/{activityid}")
-    public fun showActivity(@PathVariable("activityid") id: String): String {
+    @GetMapping("/{activityId}")
+    public fun showActivity(@PathVariable("activityId") id: String): String {
         val activity = this.activityService.showActivity(UUID.fromString(id))
-        return "id=${activity?.id}&name=${activity?.type}&created${activity?.creationDate}"
+        return if (activity == null)
+            "Activity was not found"
+        else
+            JsonObject(
+                mapOf(
+                    "id" to activity.id.toString(),
+                    "type" to activity.type,
+                    "createdAt" to activity.creationDate.toString()
+                )
+            ).toJsonString()
     }
 
     @PostMapping
