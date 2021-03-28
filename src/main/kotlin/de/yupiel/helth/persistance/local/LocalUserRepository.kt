@@ -33,8 +33,7 @@ class LocalUserRepository(@Autowired val jtm: JdbcTemplate) : IUserRepository {
     override fun findByUsername(username: String): User? {
         return try {    //TODO add prepared Statements
             val sql = "SELECT * FROM users WHERE username = '$username'"
-            val test = jtm.queryForObject(sql, rowMapper)
-            test
+            jtm.queryForObject(sql, rowMapper)
         } catch (exception: IncorrectResultSizeDataAccessException) {
             null
         }
