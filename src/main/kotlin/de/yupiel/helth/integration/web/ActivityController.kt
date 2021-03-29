@@ -8,7 +8,7 @@ import java.time.LocalDate
 import java.util.*
 
 @RestController
-@RequestMapping("/users/{userID}/activities")
+@RequestMapping("/users/{username}/activities")
 class ActivityController() {
     @Autowired
     lateinit var activityService: ActivityService

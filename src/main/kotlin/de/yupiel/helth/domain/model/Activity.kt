@@ -18,7 +18,11 @@ class Activity(type: ActivityType, creationDate: LocalDate) {
     }
 
     //Used for loading an Activity from Repository EXCLUSIVELY
-    constructor(id: UUID, type: ActivityType, creationDate: LocalDate) : this(type, creationDate) {
+    constructor(
+        id: UUID,
+        type: ActivityType,
+        creationDate: LocalDate
+    ) : this(type, creationDate) {
         this.id = id
     }
 

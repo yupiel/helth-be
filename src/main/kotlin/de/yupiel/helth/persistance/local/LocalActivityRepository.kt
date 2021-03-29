@@ -9,7 +9,10 @@ import org.springframework.dao.DataAccessException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.support.GeneratedKeyHolder
+import org.springframework.jdbc.support.KeyHolder
 import org.springframework.stereotype.Repository
+import java.sql.Connection
 import java.sql.ResultSet
 import java.util.*
 
@@ -21,7 +24,7 @@ class LocalActivityRepository(@Autowired val jtm: JdbcTemplate) : IActivityRepos
 
         ActivityRepositoryData(
             UUID.fromString(rs.getString("id")),
-            Activity.ActivityType.from(rs.getString("type"))!!,
+            Activity.ActivityType.valueOf(rs.getString("type")),
             rs.getDate("creation_date").toLocalDate()
         )
     }
@@ -37,15 +40,16 @@ class LocalActivityRepository(@Autowired val jtm: JdbcTemplate) : IActivityRepos
 
     override fun saveActivity(activity: Activity, userID: UUID): UUID? {
         return try {
-            val sql = """
-            INSERT INTO activities (id, type, creation_date, user_id) VALUES
-            (${activity.id}, ${activity.type}, ${activity.creationDate}, $userID)
-        """.trimIndent()
-
-            jtm.execute(sql)
+            jtm.update(
+                "INSERT INTO activities VALUES (?,?,?,?)",
+                activity.id.toString(),
+                activity.type.toString(),
+                activity.creationDate,
+                userID
+            )
 
             activity.id
-        } catch (exception: DataAccessException){
+        } catch (exception: DataAccessException) {
             return null
         }
     }

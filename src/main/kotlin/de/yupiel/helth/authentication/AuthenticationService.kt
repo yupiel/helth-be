@@ -1,6 +1,7 @@
 package de.yupiel.helth.authentication
 
 import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Klaxon
 import com.beust.klaxon.Parser
 import de.yupiel.helth.domain.integration.IUserRepository
 import org.springframework.beans.factory.annotation.Autowired
