@@ -14,7 +14,14 @@ class UserService(
 ) {
 
     fun findByUsername(username: String): User? {
-        return userRepository.findByUsername(username)
+        val retrievedUserData = userRepository.findByUsername(username) ?: return null
+
+        return User(
+            retrievedUserData.id,
+            retrievedUserData.username,
+            retrievedUserData.password,
+            retrievedUserData.creationDate
+        )
     }
 
     fun createNewUser(username: String, password: String): UUID? {
