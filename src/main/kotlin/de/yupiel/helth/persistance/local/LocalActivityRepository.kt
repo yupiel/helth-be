@@ -1,59 +1,52 @@
 package de.yupiel.helth.persistance.local
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
+import de.yupiel.helth.domain.integration.ActivityRepositoryData
 import de.yupiel.helth.domain.integration.IActivityRepository
 import de.yupiel.helth.domain.model.Activity
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
-import org.springframework.stereotype.Component
+import org.springframework.dao.DataAccessException
+import org.springframework.dao.IncorrectResultSizeDataAccessException
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
-import java.io.File
-import java.time.LocalDate
+import java.sql.ResultSet
 import java.util.*
 
 @Repository
 @Profile("local")
-class LocalActivityRepository : IActivityRepository {
-    override fun findById(id: UUID): Activity? {
-        val jsonOfFile = Parser.default()
-            .parse("./src/main/kotlin/de/yupiel/helth/persistance/local/test.json") as JsonArray<JsonObject>
-        val activity = jsonOfFile.find { it["id"] == id.toString() }
+class LocalActivityRepository(@Autowired val jtm: JdbcTemplate) : IActivityRepository {
+    val rowMapper: RowMapper<ActivityRepositoryData> = RowMapper<ActivityRepositoryData> { rs: ResultSet, _: Int ->
+        if (rs.wasNull()) return@RowMapper null
 
-        val retrievedActivityID = activity?.get("id")
-        val retrievedActivityTextType = activity?.get("type")
-        val retrievedActivityCreationDate = activity?.get("creationDate")
-
-        return if (retrievedActivityID == null || retrievedActivityTextType == null || retrievedActivityCreationDate == null)
-            null
-        else
-            Activity(
-                UUID.fromString(retrievedActivityID as String),
-                Activity.ActivityType.valueOf(retrievedActivityTextType as String),
-                LocalDate.parse(retrievedActivityCreationDate as String)
-            )
+        ActivityRepositoryData(
+            UUID.fromString(rs.getString("id")),
+            Activity.ActivityType.from(rs.getString("type"))!!,
+            rs.getDate("creation_date").toLocalDate()
+        )
     }
 
-    override fun saveActivity(textType: String): UUID? {
-        val enumOfTextType: Activity.ActivityType = Activity.ActivityType.from(textType)!!
-        val newActivity = Activity(UUID.randomUUID(), enumOfTextType, LocalDate.now())
-
-        val jsonOfFile = Parser.default()
-            .parse("./src/main/kotlin/de/yupiel/helth/persistance/local/test.json") as JsonArray<JsonObject>
-        jsonOfFile.add(
-            JsonObject(
-                mapOf(
-                    "id" to newActivity.id.toString(),
-                    "type" to newActivity.type,
-                    "creationDate" to newActivity.creationDate.toString()
-                )
-            )
-        )
-
-        File("./src/main/kotlin/de/yupiel/helth/persistance/local/test.json").bufferedWriter().use { out ->
-            out.write(jsonOfFile.toJsonString())
+    override fun findById(id: UUID): ActivityRepositoryData? {
+        return try {
+            val sql = "SELECT * FROM activities WHERE id = '$id'"
+            jtm.queryForObject(sql, rowMapper)
+        } catch (exception: IncorrectResultSizeDataAccessException) {
+            null
         }
+    }
 
-        return newActivity.id
+    override fun saveActivity(activity: Activity, userID: UUID): UUID? {
+        return try {
+            val sql = """
+            INSERT INTO activities (id, type, creation_date, user_id) VALUES
+            (${activity.id}, ${activity.type}, ${activity.creationDate}, $userID)
+        """.trimIndent()
+
+            jtm.execute(sql)
+
+            activity.id
+        } catch (exception: DataAccessException){
+            return null
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.beust.klaxon.JsonObject
 import de.yupiel.helth.domain.application.ActivityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 import java.util.*
 
 @RestController
@@ -13,7 +14,7 @@ class ActivityController() {
     lateinit var activityService: ActivityService
 
     @GetMapping("/{activityId}")
-    public fun showActivity(@PathVariable("activityId") id: String): String {
+    fun showActivity(@PathVariable("activityId") id: String): String {
         val activity = this.activityService.showActivity(UUID.fromString(id))
         return if (activity == null)
             "Activity was not found"
@@ -28,15 +29,22 @@ class ActivityController() {
     }
 
     @PostMapping
-    public fun saveActivity(
-        @RequestBody request: ActivityRequest,
+    fun saveActivity(
+        @RequestBody request: ActivityCreationRequest,
     ): String {
-        val returnedUUID: UUID? = this.activityService.saveActivity(request.textType)
+        val returnedUUID: UUID? =
+            this.activityService.saveActivity(
+                request.textType,
+                LocalDate.parse(request.creationDate),
+                UUID.fromString(request.userID)
+            )
 
         return returnedUUID?.toString() ?: "There was an error saving the activity"
     }
 
-    data class ActivityRequest(
-        val textType: String
+    data class ActivityCreationRequest(
+        val textType: String,
+        val creationDate: String,
+        val userID: String
     )
 }

@@ -3,18 +3,18 @@ package de.yupiel.helth.domain.model
 import java.time.LocalDate
 import java.util.*
 
-class Activity(_type: ActivityType, _creationDate: LocalDate) {
+class Activity(type: ActivityType, creationDate: LocalDate) {
     var id: UUID
-    private set
+        private set
     var type: ActivityType
-    private set
+        private set
     var creationDate: LocalDate
-    private set
+        private set
 
     init {
         this.id = UUID.randomUUID()
-        this.type = _type
-        this.creationDate = _creationDate
+        this.type = type
+        this.creationDate = creationDate
     }
 
     //Used for loading an Activity from Repository EXCLUSIVELY
