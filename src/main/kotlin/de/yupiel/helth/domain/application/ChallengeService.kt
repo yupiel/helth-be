@@ -12,19 +12,17 @@ import java.util.*
 
 @Service
 class ChallengeService(
-    @Autowired private val challengeRepository: IChallengeRepository,
-    @Autowired private val authenticationService: AuthenticationService
+    @Autowired private val challengeRepository: IChallengeRepository
 ) {
     fun saveChallenge(
-        jwtToken: String,
+        userID: UUID,
         activityType: String,
         amountOfTimesADay: Int,
         startDate: String,
         expirationDate: String
     ): UUID? {
         return try {
-            val jwtTokenPayload = this.authenticationService.checkJWTTokenValidAndReturnPayload(jwtToken) ?: return null
-            val activityTypeFromText = Activity.ActivityType.from(activityType) ?: return null
+            val activityTypeFromText = Activity.ActivityType.valueOf(activityType)
 
             val newChallenge = Challenge(
                 activityTypeFromText,
@@ -35,9 +33,9 @@ class ChallengeService(
 
             this.challengeRepository.saveChallenge(
                 newChallenge,
-                UUID.fromString(jwtTokenPayload["user_id"] as String)
+                userID
             )
-        } catch (dateTimeParseException: DateTimeParseException) {
+        } catch (exception: Exception) {
             null
         }
     }

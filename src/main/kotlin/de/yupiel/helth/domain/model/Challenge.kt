@@ -43,13 +43,9 @@ class Challenge(
         this.challengeStatus = challengeStatus
     }
 
-    enum class ChallengeStatus(val asText: String) {
-        IN_PROGRESS("In Progress"),
-        SUCCEEDED("Succeeded"),
-        FAILED("Failed");
-
-        companion object {
-            fun from(text: String?): ChallengeStatus? = values().find { it.asText == text }
-        }
+    enum class ChallengeStatus {
+        IN_PROGRESS,
+        SUCCEEDED,
+        FAILED
     }
 }

@@ -26,13 +26,9 @@ class Activity(type: ActivityType, creationDate: LocalDate) {
         this.id = id
     }
 
-    enum class ActivityType(val asText: String) {
-        DRINK_WATER("Drink Water"),
-        WALKING("Walking"),
-        RUNNING("Running");
-
-        companion object {
-            fun from(text: String?): ActivityType? = values().find { it.asText == text }
-        }
+    enum class ActivityType {
+        DRINK_WATER,
+        WALKING,
+        RUNNING
     }
 }

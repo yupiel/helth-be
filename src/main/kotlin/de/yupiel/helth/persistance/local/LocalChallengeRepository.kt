@@ -30,12 +30,16 @@ class LocalChallengeRepository(@Autowired val jtm: JdbcTemplate): IChallengeRepo
 
     override fun saveChallenge(challenge: Challenge, userID: UUID): UUID? {
         return try {
-            val sql = """
-                INSERT INTO challenges(id, activity_type, amount_of_times, start_date, expiration_date, challenge_status, user_id) VALUES
-                (${challenge.id}, ${challenge.activityType}, ${challenge.amountOfTimesADay}, ${challenge.startDate}, ${challenge.expirationDate}, ${challenge.challengeStatus}, $userID)
-            """.trimIndent()
-
-            jtm.execute(sql)
+            jtm.update(
+                "INSERT INTO challenges VALUES (?,?,?,?,?,?,?)",
+                challenge.id,
+                challenge.activityType.toString(),
+                challenge.amountOfTimesADay,
+                challenge.startDate,
+                challenge.expirationDate,
+                challenge.challengeStatus.toString(),
+                userID
+            )
 
             challenge.id
         } catch (exception: DataAccessException){

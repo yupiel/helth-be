@@ -30,9 +30,12 @@ class LocalUserRepository(@Autowired val jtm: JdbcTemplate) : IUserRepository {
     //TODO only return data classes
 
     override fun findByUsername(username: String): UserRepositoryData? {
-        return try {    //TODO add prepared Statements
-            val sql = "SELECT * FROM users WHERE username = '$username'"
-            jtm.queryForObject(sql, rowMapper)
+        return try {
+            jtm.queryForObject(
+                "SELECT * FROM users WHERE username = ?",
+                rowMapper,
+                username
+            )
         } catch (exception: IncorrectResultSizeDataAccessException) {
             null
         }
@@ -40,12 +43,13 @@ class LocalUserRepository(@Autowired val jtm: JdbcTemplate) : IUserRepository {
 
     override fun createUser(user: User): UUID? {
         return try {
-            val sql = """
-            INSERT INTO users (id, username, password, creation_date) VALUES
-            (${user.id}, ${user.username}, ${user.password}, ${user.creationDate})
-        """.trimIndent()
-
-            jtm.execute(sql)
+            jtm.update(
+                "INSERT INTO users VALUES (?,?,?,?)",
+                user.id,
+                user.username,
+                user.password,
+                user.creationDate
+            )
 
             user.id
         } catch (exception: DataAccessException){

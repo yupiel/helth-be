@@ -6,7 +6,18 @@ import java.util.*
 
 interface IActivityRepository {
     fun findById(id: UUID): ActivityRepositoryData?
-    //fun findAllByUserId(userID: UUID) : MutableList<LocalActivityRepository.ActivityRepositoryData>?
+    fun findBetweenDates(
+        userID: UUID,
+        startDate: LocalDate,
+        endDate: LocalDate
+    ) : MutableList<ActivityRepositoryData>?
+    fun findBetweenDates(
+        userID: UUID,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        activityType: Activity.ActivityType
+    ) : MutableList<ActivityRepositoryData>?
+
     fun saveActivity(activity: Activity, userID: UUID): UUID?
 }
 

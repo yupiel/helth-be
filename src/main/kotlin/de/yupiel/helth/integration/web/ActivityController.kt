@@ -1,18 +1,21 @@
 package de.yupiel.helth.integration.web
 
 import com.beust.klaxon.JsonObject
+import de.yupiel.helth.authentication.AuthenticationService
 import de.yupiel.helth.domain.application.ActivityService
+import de.yupiel.helth.domain.model.Activity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
+import java.time.format.DateTimeParseException
 import java.util.*
 
 @RestController
 @RequestMapping("/users/{username}/activities")
-class ActivityController() {
-    @Autowired
-    lateinit var activityService: ActivityService
-
+class ActivityController(
+    @Autowired private val activityService: ActivityService,
+    @Autowired private val authenticationService: AuthenticationService
+) {
     @GetMapping("/{activityId}")
     fun showActivity(@PathVariable("activityId") id: String): String {
         val activity = this.activityService.showActivity(UUID.fromString(id))
@@ -28,15 +31,57 @@ class ActivityController() {
             ).toJsonString()
     }
 
+    @GetMapping()
+    fun showActivitiesInDateRange(
+        @RequestHeader("Authorization") authorizationHeader: String,
+        @RequestParam(required = true, value = "startDate") startDateParam: String,
+        @RequestParam(required = true, value = "endDate") endDateParam: String,
+        @RequestParam(required = false, defaultValue = "", value = "activityType") activityTypeParamText: String
+    ): String {
+        return try {
+            val authHeaderParts = authorizationHeader.split(" ")
+            if (authHeaderParts[0] != "Bearer")
+                return "Wrong Authorization Type"
+            if (authHeaderParts.size < 2)
+                return "No Token found in Authorization Header"
+
+            val jwtTokenPayload =
+                this.authenticationService.checkJWTTokenValidAndReturnPayload(authHeaderParts[1])
+                    ?: return "Not Authorized"
+
+            val startDate = LocalDate.parse(startDateParam)
+            val endDate = LocalDate.parse(endDateParam)
+
+            if (activityTypeParamText.isEmpty()) {
+                this.activityService.showActivitiesBetweenDates(
+                    UUID.fromString(jwtTokenPayload["user_id"] as String),
+                    startDate,
+                    endDate
+                )!!.toJsonString()
+            } else {
+                val activityType = Activity.ActivityType.valueOf(activityTypeParamText)
+
+                this.activityService.showActivitiesBetweenDates(
+                    UUID.fromString(jwtTokenPayload["user_id"] as String),
+                    startDate,
+                    endDate,
+                    activityType
+                )!!.toJsonString()
+            }
+        } catch (exception: DateTimeParseException) {
+            "Date Format was wrong"
+        }
+    }
+
     @PostMapping
     fun saveActivity(
         @RequestBody request: ActivityCreationRequest,
     ): String {
         val returnedUUID: UUID? =
             this.activityService.saveActivity(
-                request.textType,
+                UUID.fromString(request.userID),
                 LocalDate.parse(request.creationDate),
-                UUID.fromString(request.userID)
+                request.textType
             )
 
         return returnedUUID?.toString() ?: "There was an error saving the activity"

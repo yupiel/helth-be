@@ -14,6 +14,7 @@ import org.springframework.jdbc.support.KeyHolder
 import org.springframework.stereotype.Repository
 import java.sql.Connection
 import java.sql.ResultSet
+import java.time.LocalDate
 import java.util.*
 
 @Repository
@@ -31,9 +32,49 @@ class LocalActivityRepository(@Autowired val jtm: JdbcTemplate) : IActivityRepos
 
     override fun findById(id: UUID): ActivityRepositoryData? {
         return try {
-            val sql = "SELECT * FROM activities WHERE id = '$id'"
-            jtm.queryForObject(sql, rowMapper)
+            jtm.queryForObject(
+                "SELECT * FROM activities WHERE id = ?",
+                rowMapper,
+                id
+            )
         } catch (exception: IncorrectResultSizeDataAccessException) {
+            null
+        }
+    }
+
+    override fun findBetweenDates(
+        userID: UUID,
+        startDate: LocalDate,
+        endDate: LocalDate
+    ): MutableList<ActivityRepositoryData>? {
+        return try {
+            jtm.query(
+                "SELECT * FROM activities WHERE user_id = ? AND creation_date >= ? AND creation_date <= ?",
+                rowMapper,
+                userID,
+                startDate,
+                endDate
+            )
+        } catch (exception: DataAccessException) {
+            null
+        }
+    }
+    override fun findBetweenDates(
+        userID: UUID,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        activityType: Activity.ActivityType
+    ): MutableList<ActivityRepositoryData>? {
+        return try {
+            jtm.query(
+                "SELECT * FROM activities WHERE user_id = ? AND creation_date >= ? AND creation_date <= ? AND type = ?",
+                rowMapper,
+                userID,
+                startDate.toString(),
+                endDate.toString(),
+                activityType.toString()
+            )
+        } catch (exception: DataAccessException) {
             null
         }
     }
@@ -42,7 +83,7 @@ class LocalActivityRepository(@Autowired val jtm: JdbcTemplate) : IActivityRepos
         return try {
             jtm.update(
                 "INSERT INTO activities VALUES (?,?,?,?)",
-                activity.id.toString(),
+                activity.id,
                 activity.type.toString(),
                 activity.creationDate,
                 userID
