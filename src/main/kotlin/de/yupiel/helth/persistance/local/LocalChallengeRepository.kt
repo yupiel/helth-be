@@ -40,7 +40,7 @@ class LocalChallengeRepository(@Autowired val jtm: JdbcTemplate): IChallengeRepo
         }
     }
 
-    override fun findAll(userID: UUID): MutableList<ChallengeRepositoryData>? {
+    override fun findAllForUserID(userID: UUID): MutableList<ChallengeRepositoryData>? {
         return try {
             val test = jtm.query(
                 "SELECT * FROM challenges WHERE user_id = ?",

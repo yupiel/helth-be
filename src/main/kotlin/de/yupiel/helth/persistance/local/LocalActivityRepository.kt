@@ -59,7 +59,7 @@ class LocalActivityRepository(@Autowired val jtm: JdbcTemplate) : IActivityRepos
             null
         }
     }
-    override fun findBetweenDates(
+    override fun findBetweenDatesWithType(
         userID: UUID,
         startDate: LocalDate,
         endDate: LocalDate,

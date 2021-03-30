@@ -2,14 +2,12 @@ package de.yupiel.helth.domain.application
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
-import de.yupiel.helth.authentication.AuthenticationService
 import de.yupiel.helth.domain.integration.IChallengeRepository
 import de.yupiel.helth.domain.model.Activity
 import de.yupiel.helth.domain.model.Challenge
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.format.DateTimeParseException
 import java.util.*
 
 @Service
@@ -41,9 +39,9 @@ class ChallengeService(
         }
     }
 
-    fun showAll(userID: UUID): JsonArray<JsonObject>? {
+    fun showAllForUserID(userID: UUID): JsonArray<JsonObject>? {
         return try {
-            val result = this.challengeRepository.findAll(userID) ?: return null
+            val result = this.challengeRepository.findAllForUserID(userID) ?: return null
 
             val returnValue: JsonArray<JsonObject> = JsonArray()
             result.forEach {

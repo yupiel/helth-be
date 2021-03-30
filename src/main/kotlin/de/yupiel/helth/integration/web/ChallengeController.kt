@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@RequestMapping("/users/{username}/challenges")
+@RequestMapping("/users/challenges")
 class ChallengeController(
     @Autowired private val challengeService: ChallengeService,
     @Autowired private val authenticationService: AuthenticationService
@@ -15,21 +15,13 @@ class ChallengeController(
     @GetMapping
     fun showAll(
         @RequestHeader("Authorization") authorizationHeader: String,
-        @RequestParam(required = false, value = "userID") userID: Boolean = false
+        @RequestParam(required = false, value = "userID") userIDSearch: Boolean = false
     ): String {
         return try {
-            val authHeaderParts = authorizationHeader.split(" ")
-            if (authHeaderParts[0] != "Bearer")
-                return "Wrong Authorization Type"
-            if (authHeaderParts.size < 2)
-                return "No Token found in Authorization Header"
+            val userID = authenticationService.extractUserIDFromAuthorizationHeader(authorizationHeader) ?: return "Not Authorized"
 
-            val jwtTokenPayload =
-                this.authenticationService.checkJWTTokenValidAndReturnPayload(authHeaderParts[1])
-                    ?: return "Not Authorized"
-
-            if (userID)
-                return this.challengeService.showAll(UUID.fromString(jwtTokenPayload["user_id"] as String))!!.toJsonString()
+            if (userIDSearch)
+                return this.challengeService.showAllForUserID(userID)!!.toJsonString()
             else
                 this.challengeService.showAll()!!.toJsonString()
         } catch (exception: NullPointerException) {
@@ -39,8 +31,7 @@ class ChallengeController(
 
     @PostMapping
     fun saveActivity(
-        @RequestBody request: ChallengeCreationRequest,
-        @PathVariable("username") username: String
+        @RequestBody request: ChallengeCreationRequest
     ): String {
         val jwtTokenPayload =
             this.authenticationService.checkJWTTokenValidAndReturnPayload(request.token) ?: return "Not Authorized"

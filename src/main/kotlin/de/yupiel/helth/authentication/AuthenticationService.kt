@@ -69,4 +69,18 @@ class AuthenticationService(@Autowired private val userRepository: IUserReposito
             Parser.default().parse(StringBuilder(payload)) as JsonObject
         }
     }
+
+    fun extractUserIDFromAuthorizationHeader(authorizationHeader: String): UUID? {
+        val authHeaderParts = authorizationHeader.split(" ")
+        if (authHeaderParts[0] != "Bearer")
+            return null //"Wrong Authorization Type"
+        if (authHeaderParts.size < 2)
+            return null //"No Token found in Authorization Header"
+
+        val jwtTokenPayload =
+            this.checkJWTTokenValidAndReturnPayload(authHeaderParts[1])
+                ?: return null //"Not Authorized"
+
+        return UUID.fromString(jwtTokenPayload["user_id"] as String)
+    }
 }

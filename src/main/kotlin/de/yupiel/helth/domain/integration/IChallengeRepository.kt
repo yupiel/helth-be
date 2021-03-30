@@ -6,7 +6,7 @@ import java.util.*
 
 interface IChallengeRepository {
     fun findAll(): MutableList<ChallengeRepositoryData>?
-    fun findAll(userID: UUID): MutableList<ChallengeRepositoryData>?
+    fun findAllForUserID(userID: UUID): MutableList<ChallengeRepositoryData>?
     fun saveChallenge(challenge: Challenge, userID: UUID) : UUID?
 }
 

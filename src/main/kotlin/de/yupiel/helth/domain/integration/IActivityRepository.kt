@@ -11,7 +11,7 @@ interface IActivityRepository {
         startDate: LocalDate,
         endDate: LocalDate
     ) : MutableList<ActivityRepositoryData>?
-    fun findBetweenDates(
+    fun findBetweenDatesWithType(
         userID: UUID,
         startDate: LocalDate,
         endDate: LocalDate,

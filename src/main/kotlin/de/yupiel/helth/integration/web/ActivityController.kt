@@ -11,7 +11,7 @@ import java.time.format.DateTimeParseException
 import java.util.*
 
 @RestController
-@RequestMapping("/users/{username}/activities")
+@RequestMapping("/users/activities")
 class ActivityController(
     @Autowired private val activityService: ActivityService,
     @Autowired private val authenticationService: AuthenticationService
@@ -39,37 +39,29 @@ class ActivityController(
         @RequestParam(required = false, defaultValue = "", value = "activityType") activityTypeParamText: String
     ): String {
         return try {
-            val authHeaderParts = authorizationHeader.split(" ")
-            if (authHeaderParts[0] != "Bearer")
-                return "Wrong Authorization Type"
-            if (authHeaderParts.size < 2)
-                return "No Token found in Authorization Header"
-
-            val jwtTokenPayload =
-                this.authenticationService.checkJWTTokenValidAndReturnPayload(authHeaderParts[1])
-                    ?: return "Not Authorized"
+            val userID = authenticationService.extractUserIDFromAuthorizationHeader(authorizationHeader) ?: return "Not Authorized"
 
             val startDate = LocalDate.parse(startDateParam)
             val endDate = LocalDate.parse(endDateParam)
 
             if (activityTypeParamText.isEmpty()) {
                 this.activityService.showActivitiesBetweenDates(
-                    UUID.fromString(jwtTokenPayload["user_id"] as String),
+                    userID,
                     startDate,
                     endDate
                 )!!.toJsonString()
             } else {
                 val activityType = Activity.ActivityType.valueOf(activityTypeParamText)
 
-                this.activityService.showActivitiesBetweenDates(
-                    UUID.fromString(jwtTokenPayload["user_id"] as String),
+                this.activityService.showActivitiesBetweenDatesWithType(
+                    userID,
                     startDate,
                     endDate,
                     activityType
                 )!!.toJsonString()
             }
         } catch (exception: DateTimeParseException) {
-            "Date Format was wrong"
+            "Date Format was wrong. Try YYYY-MM-DD."
         }
     }
 

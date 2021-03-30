@@ -2,7 +2,6 @@ package de.yupiel.helth.domain.application
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
-import de.yupiel.helth.domain.integration.ActivityRepositoryData
 import de.yupiel.helth.domain.integration.IActivityRepository
 import de.yupiel.helth.domain.model.Activity
 import org.springframework.beans.factory.annotation.Autowired
@@ -54,7 +53,7 @@ class ActivityService(@Autowired private val activityRepository: IActivityReposi
         }
     }
 
-    fun showActivitiesBetweenDates(
+    fun showActivitiesBetweenDatesWithType(
         userID: UUID,
         startDate: LocalDate,
         endDate: LocalDate,
@@ -62,7 +61,7 @@ class ActivityService(@Autowired private val activityRepository: IActivityReposi
     ): JsonArray<JsonObject>? {
         return try {
             val result =
-                this.activityRepository.findBetweenDates(userID, startDate, endDate, activityType) ?: return null
+                this.activityRepository.findBetweenDatesWithType(userID, startDate, endDate, activityType) ?: return null
 
             val returnValue: JsonArray<JsonObject> = JsonArray<JsonObject>()
             result.forEach {
