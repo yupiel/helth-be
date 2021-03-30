@@ -12,6 +12,31 @@ class ChallengeController(
     @Autowired private val challengeService: ChallengeService,
     @Autowired private val authenticationService: AuthenticationService
 ) {
+    @GetMapping
+    fun showAll(
+        @RequestHeader("Authorization") authorizationHeader: String,
+        @RequestParam(required = false, value = "userID") userID: Boolean = false
+    ): String {
+        return try {
+            val authHeaderParts = authorizationHeader.split(" ")
+            if (authHeaderParts[0] != "Bearer")
+                return "Wrong Authorization Type"
+            if (authHeaderParts.size < 2)
+                return "No Token found in Authorization Header"
+
+            val jwtTokenPayload =
+                this.authenticationService.checkJWTTokenValidAndReturnPayload(authHeaderParts[1])
+                    ?: return "Not Authorized"
+
+            if (userID)
+                return this.challengeService.showAll(UUID.fromString(jwtTokenPayload["user_id"] as String))!!.toJsonString()
+            else
+                this.challengeService.showAll()!!.toJsonString()
+        } catch (exception: NullPointerException) {
+            "None Found"
+        }
+    }
+
     @PostMapping
     fun saveActivity(
         @RequestBody request: ChallengeCreationRequest,

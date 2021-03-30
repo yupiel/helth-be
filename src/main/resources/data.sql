@@ -8,4 +8,6 @@ INSERT INTO activities(id, type, creation_date, user_id) VALUES
 ('ae23daae-7cef-4752-b951-a73d899348d9', 'RUNNING', '2021-03-24', 'b1805241-3365-455f-8ba9-6228458c55b0');
 
 INSERT INTO challenges(id, activity_type, amount_of_times_day, start_date, expiration_date, challenge_status, user_id) VALUES
-('c776e082-4752-9f8a-49b5a46ba4a0', 'DRINK_WATER', '10', '2021-03-29', '2022-03-27', 'IN_PROGRESS', 'c776e082-6407-49a5-a246-9d7265fc2583');
+('3e1d87fd-1ba5-41d5-9f8a-321a4f52d507', 'DRINK_WATER', '10', '2021-03-29', '2022-03-27', 'IN_PROGRESS', 'c776e082-6407-49a5-a246-9d7265fc2583'),
+('3e2d87fd-1ba5-41d5-9f8a-321a4f52d507', 'DRINK_WATER', '10', '2021-03-30', '2022-03-27', 'FAILED', 'b1805241-3365-455f-8ba9-6228458c55b0'),
+('3e3d87fd-1ba5-41d5-9f8a-321a4f52d507', 'DRINK_WATER', '10', '2021-03-30', '2022-03-27', 'SUCCEEDED', 'b1805241-3365-455f-8ba9-6228458c55b0');

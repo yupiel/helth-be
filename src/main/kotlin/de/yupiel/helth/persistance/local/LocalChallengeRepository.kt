@@ -28,6 +28,31 @@ class LocalChallengeRepository(@Autowired val jtm: JdbcTemplate): IChallengeRepo
         )
     }
 
+    override fun findAll(): MutableList<ChallengeRepositoryData>? {
+        return try {
+            val test = jtm.query(
+                "SELECT * FROM challenges",
+                rowMapper
+            )
+            test
+        } catch (exception: DataAccessException) {
+            null
+        }
+    }
+
+    override fun findAll(userID: UUID): MutableList<ChallengeRepositoryData>? {
+        return try {
+            val test = jtm.query(
+                "SELECT * FROM challenges WHERE user_id = ?",
+                rowMapper,
+                userID.toString()
+            )
+            test
+        } catch (exception: DataAccessException) {
+            null
+        }
+    }
+
     override fun saveChallenge(challenge: Challenge, userID: UUID): UUID? {
         return try {
             jtm.update(

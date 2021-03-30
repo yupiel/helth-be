@@ -1,5 +1,7 @@
 package de.yupiel.helth.domain.application
 
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
 import de.yupiel.helth.authentication.AuthenticationService
 import de.yupiel.helth.domain.integration.IChallengeRepository
 import de.yupiel.helth.domain.model.Activity
@@ -14,6 +16,56 @@ import java.util.*
 class ChallengeService(
     @Autowired private val challengeRepository: IChallengeRepository
 ) {
+    fun showAll(): JsonArray<JsonObject>? {
+        return try {
+            val result = this.challengeRepository.findAll() ?: return null
+
+            val returnValue: JsonArray<JsonObject> = JsonArray()
+            result.forEach {
+                returnValue.add(
+                    JsonObject(
+                        mapOf(
+                            "id" to it.id.toString(),
+                            "activityType" to it.activityType.toString(),
+                            "amountOfTimeADay" to it.amountOfTimesADay.toString(),
+                            "startDate" to it.startDate.toString(),
+                            "endDate" to it.expirationDate.toString(),
+                            "challengeStatus" to it.challengeStatus.toString()
+                        )
+                    )
+                )
+            }
+            returnValue
+        } catch (exception: Exception) {
+            null
+        }
+    }
+
+    fun showAll(userID: UUID): JsonArray<JsonObject>? {
+        return try {
+            val result = this.challengeRepository.findAll(userID) ?: return null
+
+            val returnValue: JsonArray<JsonObject> = JsonArray()
+            result.forEach {
+                returnValue.add(
+                    JsonObject(
+                        mapOf(
+                            "id" to it.id.toString(),
+                            "activityType" to it.activityType.toString(),
+                            "amountOfTimeADay" to it.amountOfTimesADay.toString(),
+                            "startDate" to it.startDate.toString(),
+                            "endDate" to it.expirationDate.toString(),
+                            "challengeStatus" to it.challengeStatus.toString()
+                        )
+                    )
+                )
+            }
+            returnValue
+        } catch (exception: Exception) {
+            null
+        }
+    }
+
     fun saveChallenge(
         userID: UUID,
         activityType: String,
