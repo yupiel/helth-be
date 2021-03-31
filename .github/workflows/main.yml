@@ -28,7 +28,7 @@ jobs:
       - name: Gradle Build
         uses: eskatos/gradle-command-action@v1
         with:
-          args: build
+          arguments: build
 
       - name: Docker Build & Push to GitHub Package
         uses: opspresso/action-docker@master
