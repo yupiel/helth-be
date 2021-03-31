@@ -25,15 +25,23 @@ jobs:
         uses: eskatos/gradle-command-action@v1
         with:
           arguments: test
+
       - name: Gradle Build
         uses: eskatos/gradle-command-action@v1
         with:
           arguments: build
 
+  docker:
+    needs: gradle
+    name: DockerHub and Github Packages Push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
       - name: Docker Build & Push to GitHub Package
         uses: opspresso/action-docker@master
         with:
-          args: --docker
+          args: --build-arg JAR_FILE=build/libs/\*.jar
         env:
           USERNAME: yupiel
           PASSWORD: ${{ secrets.GIT_TOKEN }}
@@ -46,7 +54,7 @@ jobs:
       - name: Docker Build & Push to Docker Hub
         uses: opspresso/action-docker@master
         with:
-          args: --docker
+          args: --build-arg JAR_FILE=build/libs/\*.jar
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_TOKEN }}
