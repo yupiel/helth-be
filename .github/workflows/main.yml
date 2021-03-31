@@ -32,9 +32,9 @@ jobs:
           arguments: build
 
       - name: Docker Build & Push to GitHub Package
-        uses: opspresso/action-docker@master
+        uses: opspresso/action-docker@v0.2.17
         with:
-          args: --build-arg JAR_FILE=build/libs/\*.jar
+          args: --docker --build-arg JAR_FILE=build/libs/\*.jar
         env:
           USERNAME: yupiel
           PASSWORD: ${{ secrets.GIT_TOKEN }}
@@ -45,9 +45,9 @@ jobs:
           LATEST: true
 
       - name: Docker Build & Push to Docker Hub
-        uses: opspresso/action-docker@master
+        uses: opspresso/action-docker@v0.2.17
         with:
-          args: --build-arg JAR_FILE=build/libs/\*.jar
+          args: --docker --build-arg JAR_FILE=build/libs/\*.jar
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_TOKEN }}
