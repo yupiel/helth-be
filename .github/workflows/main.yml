@@ -55,3 +55,13 @@ jobs:
           IMAGE_NAME: yupiel/helth
           TAG_NAME: latest
           LATEST: true
+
+      - name: Deploy Docker Container to Heroku
+        uses: AkhileshNS/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          heroku_app_name: helthpiel
+          branch: main
+          usedocker: true
+          docker_heroku_process_type: web
