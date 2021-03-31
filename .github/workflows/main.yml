@@ -31,13 +31,6 @@ jobs:
         with:
           arguments: build
 
-  docker:
-    needs: gradle
-    name: DockerHub and Github Packages Push
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
       - name: Docker Build & Push to GitHub Package
         uses: opspresso/action-docker@master
         with:
