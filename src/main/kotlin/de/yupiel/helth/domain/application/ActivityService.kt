@@ -2,7 +2,7 @@ package de.yupiel.helth.domain.application
 
 import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
-import de.yupiel.helth.domain.integration.IActivityRepository
+import de.yupiel.helth.domain.integration.ActivityRepository
 import de.yupiel.helth.domain.model.Activity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -12,81 +12,55 @@ import java.util.*
 import kotlin.IllegalArgumentException
 
 @Service
-class ActivityService(@Autowired private val activityRepository: IActivityRepository) {
-    fun showActivity(id: UUID): Activity? {
-        val retrievedActivityData = this.activityRepository.findById(id)
-        return if (retrievedActivityData == null)
-            null
+class ActivityService(
+    @Autowired private val activityRepository: ActivityRepository
+) {
+    fun findById(id: UUID): Activity? {
+        val activity = this.activityRepository.findById(id)
+
+        return if (!activity.isEmpty)
+            activity.get()
         else
-            Activity(
-                retrievedActivityData.id,
-                retrievedActivityData.type,
-                retrievedActivityData.creationDate
-            )
+            null
     }
 
-    fun showActivitiesBetweenDates(
+    fun findBetweenDates(
         userID: UUID,
         startDate: LocalDate,
         endDate: LocalDate
-    ): JsonArray<JsonObject>? {
+    ): List<Activity>? {
         return try {
-            val result =
-                this.activityRepository.findBetweenDates(userID, startDate, endDate) ?: return null
+            val result = this.activityRepository.findBetweenDates(userID, startDate, endDate)
+            if (result.isEmpty()) return null
 
-            val returnValue: JsonArray<JsonObject> = JsonArray<JsonObject>()
-            result.forEach {
-                returnValue.add(
-                    JsonObject(
-                        mapOf(
-                            "id" to it.id.toString(),
-                            "type" to it.type.toString(),
-                            "creationDate" to it.creationDate.toString()
-                        )
-                    )
-                )
-            }
-
-            returnValue
+            result
         } catch (exception: Exception) {
             null
         }
     }
 
-    fun showActivitiesBetweenDatesWithType(
+    fun findBetweenDatesWithType(
         userID: UUID,
         startDate: LocalDate,
         endDate: LocalDate,
         activityType: Activity.ActivityType
-    ): JsonArray<JsonObject>? {
+    ): List<Activity>? {
         return try {
-            val result =
-                this.activityRepository.findBetweenDatesWithType(userID, startDate, endDate, activityType) ?: return null
+            val result = this.activityRepository.findBetweenDatesWithType(userID, startDate, endDate, activityType)
+            if (result.isEmpty()) return null
 
-            val returnValue: JsonArray<JsonObject> = JsonArray<JsonObject>()
-            result.forEach {
-                returnValue.add(
-                    JsonObject(
-                        mapOf(
-                            "id" to it.id.toString(),
-                            "type" to it.type.toString(),
-                            "creationDate" to it.creationDate.toString()
-                        )
-                    )
-                )
-            }
-
-            returnValue
+            result
         } catch (exception: Exception) {
             null
         }
     }
 
-    fun saveActivity(userID: UUID, creationDate: LocalDate, textType: String): UUID? {
+    fun save(userID: UUID, creationDate: LocalDate, textType: String): Activity? {
         return try {
             val activityType = Activity.ActivityType.valueOf(textType)
-            val newActivity = Activity(activityType, creationDate)
-            return this.activityRepository.saveActivity(newActivity, userID)
+            val newActivity = Activity(activityType, creationDate, userID)
+
+            this.activityRepository.save(newActivity)
         } catch (exception: IllegalArgumentException) {
             null
         }

@@ -1,0 +1,59 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  gradle:
+    name: Gradle Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Java 15
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+
+      - name: Gradle Test
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: test
+      - name: Gradle Build
+        uses: eskatos/gradle-command-action@v1
+        with:
+          args: build
+
+  docker:
+    name: Github Package & DockerHub Push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Docker Build & Push to GitHub Package
+        uses: opspresso/action-docker@master
+        with:
+          args: --docker
+        env:
+          USERNAME: yupiel
+          PASSWORD: ${{ secrets.GIT_TOKEN }}
+          REGISTRY: docker.pkg.github.com
+          DOCKERFILE: Dockerfile
+          IMAGE_NAME: helth
+          TAG_NAME: latest
+          LATEST: true
+
+      - name: Docker Build & Push to Docker Hub
+        uses: opspresso/action-docker@master
+        with:
+          args: --docker
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+          DOCKERFILE: Dockerfile
+          IMAGE_NAME: yupiel/helth
+          TAG_NAME: latest
+          LATEST: true

@@ -1,8 +1,6 @@
 package de.yupiel.helth.domain.application
 
-import com.beust.klaxon.JsonArray
-import com.beust.klaxon.JsonObject
-import de.yupiel.helth.domain.integration.IChallengeRepository
+import de.yupiel.helth.domain.integration.ChallengeRepository
 import de.yupiel.helth.domain.model.Activity
 import de.yupiel.helth.domain.model.Challenge
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,65 +10,37 @@ import java.util.*
 
 @Service
 class ChallengeService(
-    @Autowired private val challengeRepository: IChallengeRepository
+    @Autowired private val challengeRepository: ChallengeRepository
 ) {
-    fun showAll(): JsonArray<JsonObject>? {
+    fun findAll(): List<Challenge>? {
         return try {
-            val result = this.challengeRepository.findAll() ?: return null
+            val result = this.challengeRepository.findAll().toList()
+            if (result.isEmpty()) return null
 
-            val returnValue: JsonArray<JsonObject> = JsonArray()
-            result.forEach {
-                returnValue.add(
-                    JsonObject(
-                        mapOf(
-                            "id" to it.id.toString(),
-                            "activityType" to it.activityType.toString(),
-                            "amountOfTimeADay" to it.amountOfTimesADay.toString(),
-                            "startDate" to it.startDate.toString(),
-                            "endDate" to it.expirationDate.toString(),
-                            "challengeStatus" to it.challengeStatus.toString()
-                        )
-                    )
-                )
-            }
-            returnValue
+            result
         } catch (exception: Exception) {
             null
         }
     }
 
-    fun showAllForUserID(userID: UUID): JsonArray<JsonObject>? {
+    fun findAllForUserID(userID: UUID): List<Challenge>? {
         return try {
-            val result = this.challengeRepository.findAllForUserID(userID) ?: return null
+            val result = this.challengeRepository.findAllByUserID(userID)
+            if (result.isEmpty()) return null
 
-            val returnValue: JsonArray<JsonObject> = JsonArray()
-            result.forEach {
-                returnValue.add(
-                    JsonObject(
-                        mapOf(
-                            "id" to it.id.toString(),
-                            "activityType" to it.activityType.toString(),
-                            "amountOfTimeADay" to it.amountOfTimesADay.toString(),
-                            "startDate" to it.startDate.toString(),
-                            "endDate" to it.expirationDate.toString(),
-                            "challengeStatus" to it.challengeStatus.toString()
-                        )
-                    )
-                )
-            }
-            returnValue
+            result
         } catch (exception: Exception) {
             null
         }
     }
 
-    fun saveChallenge(
+    fun save(
         userID: UUID,
         activityType: String,
         amountOfTimesADay: Int,
         startDate: String,
         expirationDate: String
-    ): UUID? {
+    ): Challenge? {
         return try {
             val activityTypeFromText = Activity.ActivityType.valueOf(activityType)
 
@@ -78,13 +48,11 @@ class ChallengeService(
                 activityTypeFromText,
                 amountOfTimesADay,
                 LocalDate.parse(startDate),
-                LocalDate.parse(expirationDate)
-            )
-
-            this.challengeRepository.saveChallenge(
-                newChallenge,
+                LocalDate.parse(expirationDate),
                 userID
             )
+
+            this.challengeRepository.save(newChallenge)
         } catch (exception: Exception) {
             null
         }

@@ -1,9 +1,8 @@
 package de.yupiel.helth.authentication
 
 import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Klaxon
 import com.beust.klaxon.Parser
-import de.yupiel.helth.domain.integration.IUserRepository
+import de.yupiel.helth.domain.integration.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
@@ -12,7 +11,7 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Service
-class AuthenticationService(@Autowired private val userRepository: IUserRepository) {
+class AuthenticationService(@Autowired private val userRepository: UserRepository) {
     private val encoder: BCryptPasswordEncoder = BCryptPasswordEncoder()
 
     //PASSWORD GENERATION AND CHECKING

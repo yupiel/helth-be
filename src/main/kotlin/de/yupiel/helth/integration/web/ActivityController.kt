@@ -1,5 +1,6 @@
 package de.yupiel.helth.integration.web
 
+import com.beust.klaxon.JsonArray
 import com.beust.klaxon.JsonObject
 import de.yupiel.helth.authentication.AuthenticationService
 import de.yupiel.helth.domain.application.ActivityService
@@ -18,17 +19,12 @@ class ActivityController(
 ) {
     @GetMapping("/{activityId}")
     fun showActivity(@PathVariable("activityId") id: String): String {
-        val activity = this.activityService.showActivity(UUID.fromString(id))
+        val activity = this.activityService.findById(UUID.fromString(id))
+
         return if (activity == null)
             "Activity was not found"
         else
-            JsonObject(
-                mapOf(
-                    "id" to activity.id.toString(),
-                    "type" to activity.type,
-                    "createdAt" to activity.creationDate.toString()
-                )
-            ).toJsonString()
+            activityToJsonObject(activity).toJsonString()
     }
 
     @GetMapping()
@@ -39,27 +35,31 @@ class ActivityController(
         @RequestParam(required = false, defaultValue = "", value = "activityType") activityTypeParamText: String
     ): String {
         return try {
-            val userID = authenticationService.extractUserIDFromAuthorizationHeader(authorizationHeader) ?: return "Not Authorized"
+            val userID = authenticationService.extractUserIDFromAuthorizationHeader(authorizationHeader)
+                ?: return "Not Authorized"
 
             val startDate = LocalDate.parse(startDateParam)
             val endDate = LocalDate.parse(endDateParam)
 
+            val activities: List<Activity>?
             if (activityTypeParamText.isEmpty()) {
-                this.activityService.showActivitiesBetweenDates(
+                activities = this.activityService.findBetweenDates(
                     userID,
                     startDate,
                     endDate
-                )!!.toJsonString()
+                ) ?: return "No Activities found between the dates of $startDate and $endDate"
             } else {
                 val activityType = Activity.ActivityType.valueOf(activityTypeParamText)
 
-                this.activityService.showActivitiesBetweenDatesWithType(
+                activities = this.activityService.findBetweenDatesWithType(
                     userID,
                     startDate,
                     endDate,
                     activityType
-                )!!.toJsonString()
+                ) ?: return "No Activities of type $activityTypeParamText found between the dates of $startDate and $endDate"
             }
+
+            activityListToJsonArray(activities).toJsonString()
         } catch (exception: DateTimeParseException) {
             "Date Format was wrong. Try YYYY-MM-DD."
         }
@@ -69,14 +69,34 @@ class ActivityController(
     fun saveActivity(
         @RequestBody request: ActivityCreationRequest,
     ): String {
-        val returnedUUID: UUID? =
-            this.activityService.saveActivity(
+        val activity =
+            this.activityService.save(
                 UUID.fromString(request.userID),
                 LocalDate.parse(request.creationDate),
                 request.textType
-            )
+            ) ?: return "There was an error saving the activity"
 
-        return returnedUUID?.toString() ?: "There was an error saving the activity"
+        return activityToJsonObject(activity).toJsonString()
+    }
+
+    private fun activityToJsonObject(activity: Activity): JsonObject {
+        return JsonObject(
+            mapOf(
+                "id" to activity.id.toString(),
+                "type" to activity.type.toString(),
+                "creationDate" to activity.creationDate.toString()
+            )
+        )
+    }
+
+    private fun activityListToJsonArray(activities: List<Activity>): JsonArray<JsonObject> {
+        val returnValue: JsonArray<JsonObject> = JsonArray()
+
+        activities.forEach {
+            returnValue.add(activityToJsonObject(it))
+        }
+
+        return returnValue
     }
 
     data class ActivityCreationRequest(
