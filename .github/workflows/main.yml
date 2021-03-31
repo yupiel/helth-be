@@ -40,7 +40,7 @@ jobs:
           PASSWORD: ${{ secrets.GIT_TOKEN }}
           REGISTRY: docker.pkg.github.com
           DOCKERFILE: Dockerfile
-          DOCKER_BUILD_ARGS: JAR_FILE=build/libs/\*.jar
+          DOCKER_BUILD_ARGS: --build-arg JAR_FILE=build/libs/\*.jar
           IMAGE_NAME: helth
           TAG_NAME: latest
           LATEST: true
@@ -53,7 +53,7 @@ jobs:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_TOKEN }}
           DOCKERFILE: Dockerfile
-          DOCKER_BUILD_ARGS: JAR_FILE=build/libs/\*.jar
+          DOCKER_BUILD_ARGS: --build-arg JAR_FILE=build/libs/\*.jar
           IMAGE_NAME: yupiel/helth
           TAG_NAME: latest
           LATEST: true
