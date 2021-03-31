@@ -40,7 +40,7 @@ jobs:
           PASSWORD: ${{ secrets.GIT_TOKEN }}
           REGISTRY: docker.pkg.github.com
           DOCKERFILE: Dockerfile
-          DOCKER_BUILD_ARGS: --build-arg JAR_FILE=build/libs/\*.jar
+          DOCKER_BUILD_ARGS: --build-arg JAR_FILE=./build/libs/\*.jar
           IMAGE_NAME: helth
           TAG_NAME: latest
           LATEST: true
@@ -48,12 +48,12 @@ jobs:
       - name: Docker Build & Push to Docker Hub
         uses: opspresso/action-docker@v0.2.17
         with:
-          args: --docker --build-arg JAR_FILE=build/libs/\*.jar
+          args: --docker --build-arg JAR_FILE=./build/libs/\*.jar
         env:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           PASSWORD: ${{ secrets.DOCKER_TOKEN }}
           DOCKERFILE: Dockerfile
-          DOCKER_BUILD_ARGS: --build-arg JAR_FILE=build/libs/\*.jar
+          DOCKER_BUILD_ARGS: --build-arg JAR_FILE=./build/libs/\*.jar
           IMAGE_NAME: yupiel/helth
           TAG_NAME: latest
           LATEST: true
