@@ -4,6 +4,7 @@ import de.yupiel.helth.activity.model.ActivityRepository
 import de.yupiel.helth.activity.model.Activity
 import de.yupiel.helth.common.NotFoundException
 import de.yupiel.helth.common.RequestBodyException
+import de.yupiel.helth.common.RequestParameterException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -28,6 +29,8 @@ class ActivityService(
         startDate: LocalDate,
         endDate: LocalDate
     ): List<Activity> {
+        if(startDate > endDate) throw RequestParameterException("endDate '$endDate' can't have a date before startDate '$startDate")
+
         val result = this.activityRepository.findBetweenDates(userID, startDate, endDate)
         if (result.isEmpty()) throw NotFoundException("No activities found between the dates of '$startDate' and '$endDate' for user with id '$userID'")
         else return result
@@ -37,14 +40,21 @@ class ActivityService(
         userID: UUID,
         startDate: LocalDate,
         endDate: LocalDate,
-        activityType: Activity.ActivityType
+        activityTypeText: String
     ): List<Activity> {
-        val result = this.activityRepository.findBetweenDatesWithType(userID, startDate, endDate, activityType)
-        if (result.isEmpty()) throw NotFoundException("No activities of type '$activityType' found between the dates of '$startDate' and '$endDate' for user with id '$userID'")
-        else return result
+        try {
+            if (startDate > endDate) throw RequestParameterException("endDate '$endDate' can't have a date before startDate '$startDate")
+            val activityType = Activity.ActivityType.valueOf(activityTypeText)
+
+            val result = this.activityRepository.findBetweenDatesWithType(userID, startDate, endDate, activityType)
+            if (result.isEmpty()) throw NotFoundException("No activities of type '$activityType' found between the dates of '$startDate' and '$endDate' for user with id '$userID'")
+            else return result
+        } catch(exception: IllegalArgumentException){
+            throw RequestParameterException("Activity type text was malformed")
+        }
     }
 
-    fun save(userID: UUID, creationDate: LocalDate, textType: String): Activity {
+    fun createActivity(userID: UUID, creationDate: LocalDate, textType: String): Activity {
         try {
             val activityType = Activity.ActivityType.valueOf(textType)
             val newActivity = Activity(activityType, creationDate, userID)

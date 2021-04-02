@@ -22,29 +22,26 @@ class ChallengeServiceTest {
         service.save(
             UUID.fromString("b1805241-3365-455f-8ba9-6228458c55b0"),
             "DRINK_WATER",
-            3,
-            LocalDate.now().toString(),
-            LocalDate.now().plusDays(7).toString()
+            6,
+            1
         )
         service.save(
             UUID.fromString("b1805241-3365-455f-8ba9-6228458c55b0"),
             "RUNNING",
-            1,
-            LocalDate.now().toString(),
-            LocalDate.now().plusDays(7).toString()
+            2,
+            2
         )
         service.save(
             UUID.fromString("b1805241-3365-455f-8ba9-6228458c55b0"),
             "WALKING",
-            1,
-            LocalDate.now().toString(),
-            LocalDate.now().plusDays(7).toString()
+            2,
+            3
         )
     }
 
     @Test
     fun test() {
         val test = service.findAllForUserID(UUID.fromString("b1805241-3365-455f-8ba9-6228458c55b0"))
-        Assertions.assertTrue(test!!.isNotEmpty())
+        Assertions.assertTrue(test.isNotEmpty())
     }
 }

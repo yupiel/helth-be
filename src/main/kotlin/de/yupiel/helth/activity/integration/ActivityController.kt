@@ -34,21 +34,18 @@ class ActivityController(
         val startDate = LocalDate.parse(startDateParam)
         val endDate = LocalDate.parse(endDateParam)
 
-        val activities: List<Activity>?
-        if (activityTypeParamText.isEmpty()) {
-            activities = this.activityService.findBetweenDates(
+        val activities: List<Activity> = if (activityTypeParamText.isEmpty()) {
+            this.activityService.findBetweenDates(
                 userID,
                 startDate,
                 endDate
             )
         } else {
-            val activityType = Activity.ActivityType.valueOf(activityTypeParamText)
-
-            activities = this.activityService.findBetweenDatesWithType(
+            this.activityService.findBetweenDatesWithType(
                 userID,
                 startDate,
                 endDate,
-                activityType
+                activityTypeParamText
             )
         }
 
@@ -65,7 +62,7 @@ class ActivityController(
         val userID = authenticationService.extractUserIDFromAuthorizationHeader(authorizationHeader)
 
         val activity =
-            this.activityService.save(
+            this.activityService.createActivity(
                 userID,
                 LocalDate.parse(request.creationDate),
                 request.textType
