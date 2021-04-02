@@ -1,6 +1,9 @@
 spring:
   application.name: helth
-  profiles.active: local
+
+server:
+  servlet:
+    context-path: /api
 
 ---
 spring.profiles: local
@@ -11,6 +14,7 @@ spring:
     driverClassName: org.h2.Driver
     username: admin
     password: admin
+    connectionPoolSize:
   h2:
     console.enabled: true
     console.path: /h2-console
