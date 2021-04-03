@@ -44,18 +44,6 @@ jobs:
           TAG_NAME: latest
           LATEST: true
 
-      - name: Docker Build & Push to Docker Hub
-        uses: opspresso/action-docker@v0.2.17
-        with:
-          args: --docker
-        env:
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          PASSWORD: ${{ secrets.DOCKER_TOKEN }}
-          DOCKERFILE: Dockerfile
-          IMAGE_NAME: yupiel/helth
-          TAG_NAME: latest
-          LATEST: true
-
       - name: Deploy Docker Container to Heroku
         uses: AkhileshNS/heroku-deploy@v3.12.12
         with:
