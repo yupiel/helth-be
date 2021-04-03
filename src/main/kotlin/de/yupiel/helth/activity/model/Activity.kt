@@ -40,6 +40,9 @@ class Activity(type: ActivityType, creationDate: LocalDate, userID: UUID) {
     enum class ActivityType {
         DRINK_WATER,
         WALKING,
-        RUNNING;
+        RUNNING,
+        CYCLING,
+        SWIMMING,
+        CALISTHENICS,
     }
 }
