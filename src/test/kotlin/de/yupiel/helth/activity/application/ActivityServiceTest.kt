@@ -2,6 +2,7 @@ package de.yupiel.helth.activity.application
 
 import de.yupiel.helth.activity.model.ActivityRepository
 import de.yupiel.helth.activity.model.Activity
+import de.yupiel.helth.challenge.application.ChallengeService
 import de.yupiel.helth.common.NotFoundException
 import de.yupiel.helth.common.RequestBodyException
 import de.yupiel.helth.common.RequestParameterException
@@ -17,13 +18,16 @@ import java.util.*
 internal class ActivityServiceTest {
     @Autowired
     private lateinit var repository: ActivityRepository
-    private lateinit var service: ActivityService
+    @Autowired
+    private lateinit var challengeService: ChallengeService
+
+    private lateinit var activityService: ActivityService
 
     private final val testUserID: UUID = UUID.fromString("c776e082-6407-49a5-a246-9d7265fc2583")
 
     @BeforeEach
     fun beforeEach() {
-        service = ActivityService(repository)
+        activityService = ActivityService(repository, challengeService)
 
         givenActivityExists("DRINK_WATER", testUserID)
         givenActivityExists("DRINK_WATER", testUserID)
@@ -32,7 +36,7 @@ internal class ActivityServiceTest {
     }
 
     private fun givenActivityExists(textType: String, userID: UUID): Activity? {
-        return service.createActivity(userID, LocalDate.now(), textType)
+        return activityService.createActivity(userID, LocalDate.now(), textType)
     }
 
     @Test
@@ -41,20 +45,20 @@ internal class ActivityServiceTest {
             givenActivityExists("DRINK_WATER", testUserID)
         Assertions.assertNotNull(savedActivity)
 
-        val actualActivity = service.findById(savedActivity!!.id)
+        val actualActivity = activityService.findById(savedActivity!!.id)
         Assertions.assertEquals(savedActivity, actualActivity)
     }
 
     @Test
     fun `findByID does not find activity and throws NotFoundException`() {
         Assertions.assertThrows(NotFoundException::class.java) {
-            service.findById(UUID.randomUUID())
+            activityService.findById(UUID.randomUUID())
         }
     }
 
     @Test
     fun `findBetweenDates finds existing activities between supplied dates and return them`() {
-        val activities = service.findBetweenDates(
+        val activities = activityService.findBetweenDates(
             testUserID,
             LocalDate.now().minusDays(2),
             LocalDate.now().plusDays(1)
@@ -66,7 +70,7 @@ internal class ActivityServiceTest {
     @Test
     fun `findBetweenDates does not find activities when the startDate is further in the future than the endDate and throws RequestParameterException`() {
         Assertions.assertThrows(RequestParameterException::class.java) {
-            service.findBetweenDates(
+            activityService.findBetweenDates(
                 testUserID,
                 LocalDate.now().plusDays(2),
                 LocalDate.now().plusDays(1)
@@ -77,7 +81,7 @@ internal class ActivityServiceTest {
     @Test
     fun `findBetweenDates does not find activities between supplied dates and throws NotFoundException`() {
         Assertions.assertThrows(NotFoundException::class.java) {
-            service.findBetweenDates(
+            activityService.findBetweenDates(
                 testUserID,
                 LocalDate.now().plusYears(2),
                 LocalDate.now().plusYears(5)
@@ -87,7 +91,7 @@ internal class ActivityServiceTest {
 
     @Test
     fun `findBetweenDatesWithType finds existing activities between supplied dates and return them`() {
-        val activities = service.findBetweenDatesWithType(
+        val activities = activityService.findBetweenDatesWithType(
             testUserID,
             LocalDate.now().minusDays(2),
             LocalDate.now().plusDays(1),
@@ -100,7 +104,7 @@ internal class ActivityServiceTest {
     @Test
     fun `findBetweenDatesWithType does not find activities when the startDate is further in the future than the endDate and throws RequestParameterException`() {
         Assertions.assertThrows(RequestParameterException::class.java) {
-            service.findBetweenDatesWithType(
+            activityService.findBetweenDatesWithType(
                 testUserID,
                 LocalDate.now().plusDays(2),
                 LocalDate.now().plusDays(1),
@@ -112,7 +116,7 @@ internal class ActivityServiceTest {
     @Test
     fun `findBetweenDatesWithType does not find activities between supplied dates and throws NotFoundException`() {
         Assertions.assertThrows(NotFoundException::class.java) {
-            service.findBetweenDatesWithType(
+            activityService.findBetweenDatesWithType(
                 testUserID,
                 LocalDate.now().plusYears(2),
                 LocalDate.now().plusYears(5),
@@ -124,7 +128,7 @@ internal class ActivityServiceTest {
     @Test
     fun `findBetweenDatesWithType does not find activities of specified type between supplied dates and throws NotFoundException`() {
         Assertions.assertThrows(NotFoundException::class.java) {
-            service.findBetweenDatesWithType(
+            activityService.findBetweenDatesWithType(
                 testUserID,
                 LocalDate.now().minusDays(2),
                 LocalDate.now().plusDays(2),
@@ -135,7 +139,7 @@ internal class ActivityServiceTest {
 
     @Test
     fun `createActivity successfully creates an Activity and return it`() {
-        val activity = service.createActivity(
+        val activity = activityService.createActivity(
             testUserID,
             LocalDate.now(),
             "WALKING"
@@ -147,7 +151,7 @@ internal class ActivityServiceTest {
     @Test
     fun `createActivity can't resolve activityType String and throws RequestBodyException`() {
         Assertions.assertThrows(RequestBodyException::class.java) {
-            service.createActivity(
+            activityService.createActivity(
                 testUserID,
                 LocalDate.now(),
                 "EAT_BURGER"

@@ -19,7 +19,7 @@ class User(username: String, password: String) {
     @Column(name = "password", nullable = false, unique = false)
     var password: String
         private set
-    @Column(name = "score", nullable = false, unique = false)
+    @Column(name = "score", nullable = false, unique = false, columnDefinition = "VARCHAR")
     var score: BigInteger
         private set
     @Column(name = "creation_date", nullable = false, unique = false)
@@ -30,7 +30,7 @@ class User(username: String, password: String) {
         this.id = UUID.randomUUID()
         this.username = username
         this.password = password
-        this.score = BigInteger("0")    //TODO add support in service and Controller
+        this.score = BigInteger("9999999999999999999999999999999999999999999999")    //TODO add support in service and Controller
         this.creationDate = LocalDate.now()
     }
 }

@@ -2,7 +2,6 @@ package de.yupiel.helth.common
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.lang.RuntimeException
+import org.springframework.web.client.HttpClientErrorException
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-class RequestHeaderException(message: String): RuntimeException(message)
+class RequestHeaderException(message: String): HttpClientErrorException(HttpStatus.BAD_REQUEST, message)

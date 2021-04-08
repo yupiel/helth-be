@@ -8,6 +8,7 @@ import de.yupiel.helth.user.model.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -17,7 +18,7 @@ class AuthenticationService(@Autowired private val userRepository: UserRepositor
     private val encoder: BCryptPasswordEncoder = BCryptPasswordEncoder()
 
     //PASSWORD GENERATION AND CHECKING
-    fun encodePassword(password: String): String {
+    fun encryptPassword(password: String): String {
         return encoder.encode(password)
     }
 
@@ -45,8 +46,8 @@ class AuthenticationService(@Autowired private val userRepository: UserRepositor
                 mapOf(
                     "user_id" to userID.toString(),
                     "username" to username,
-                    "iat" to LocalTime.now().truncatedTo(ChronoUnit.SECONDS).toString(),
-                    "exp" to LocalTime.now().plusHours(expirationInHours).truncatedTo(ChronoUnit.SECONDS).toString()
+                    "iat" to LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).toString(),
+                    "exp" to LocalDateTime.now().plusHours(expirationInHours).truncatedTo(ChronoUnit.SECONDS).toString()
                 )
             ).toJsonString().encodeToByteArray()
         )
@@ -63,12 +64,16 @@ class AuthenticationService(@Autowired private val userRepository: UserRepositor
 
         val verifyingSignature = encoder.matches("${retrievedHeader}.${retrievedPayload}", signature)
 
-        return if (!verifyingSignature)
+        if (!verifyingSignature)
             throw NotAuthorizedException("The Authorization token could not be validated")
-        else {
-            val payload = String(Base64.getDecoder().decode(retrievedPayload))
-            Parser.default().parse(StringBuilder(payload)) as JsonObject
-        }
+
+        val payload = Parser.default().parse(String(Base64.getDecoder().decode(retrievedPayload))) as JsonObject
+        val expirationDate = LocalDateTime.parse(payload["exp"] as String)
+
+        if(expirationDate < LocalDateTime.now())
+            throw NotAuthorizedException("The access token has expired. Please login again.")
+
+        return payload
     }
 
     fun extractUserIDFromAuthorizationHeader(authorizationHeader: String): UUID {

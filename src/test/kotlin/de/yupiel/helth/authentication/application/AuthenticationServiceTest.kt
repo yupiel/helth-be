@@ -23,7 +23,7 @@ internal class AuthenticationServiceTest {
     @Test
     fun `encodePassword should return hashed password String`() {
         val password = "yeetyote"
-        val actual = service.encodePassword(password)
+        val actual = service.encryptPassword(password)
 
         assertTrue(actual.isNotEmpty())
     }

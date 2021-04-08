@@ -15,8 +15,8 @@ class ActivityController(
     @Autowired private val activityService: ActivityService,
     @Autowired private val authenticationService: AuthenticationService
 ) {
-    @GetMapping("/{activityId}")
-    fun showActivity(@PathVariable("activityId") id: String): ActivityDto {
+    @GetMapping("/{activityID}")
+    fun showActivity(@PathVariable("activityID") id: String): ActivityDto {
         val activity = this.activityService.findById(UUID.fromString(id))
 
         return ActivityDto.from(activity)

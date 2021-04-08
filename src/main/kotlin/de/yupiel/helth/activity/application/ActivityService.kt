@@ -2,6 +2,7 @@ package de.yupiel.helth.activity.application
 
 import de.yupiel.helth.activity.model.ActivityRepository
 import de.yupiel.helth.activity.model.Activity
+import de.yupiel.helth.challenge.application.ChallengeService
 import de.yupiel.helth.common.NotFoundException
 import de.yupiel.helth.common.RequestBodyException
 import de.yupiel.helth.common.RequestParameterException
@@ -13,7 +14,8 @@ import kotlin.IllegalArgumentException
 
 @Service
 class ActivityService(
-    @Autowired private val activityRepository: ActivityRepository
+    @Autowired private val activityRepository: ActivityRepository,
+    @Autowired private val challengeService: ChallengeService
 ) {
     fun findById(id: UUID): Activity {
         val activity = this.activityRepository.findById(id)
@@ -59,9 +61,16 @@ class ActivityService(
             val activityType = Activity.ActivityType.valueOf(textType)
             val newActivity = Activity(activityType, creationDate, userID)
 
-            return this.activityRepository.save(newActivity)
+            val savedActivity = this.activityRepository.save(newActivity)
+            this.challengeService.updateChallengeCounterForUserForType(userID, activityType)
+
+            return savedActivity
         } catch (exception: IllegalArgumentException) {
             throw RequestBodyException("Parameter textType does not equate to an Activity Type")
         }
+    }
+
+    fun deleteActivitiesFromUserID(userID: UUID) {
+        this.activityRepository.deleteByRelatedUserID(userID)
     }
 }

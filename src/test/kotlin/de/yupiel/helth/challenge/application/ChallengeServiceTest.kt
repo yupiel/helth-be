@@ -1,5 +1,6 @@
 package de.yupiel.helth.challenge.application
 
+import de.yupiel.helth.activity.model.Activity
 import de.yupiel.helth.challenge.model.ChallengeRepository
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -40,8 +41,12 @@ class ChallengeServiceTest {
     }
 
     @Test
-    fun test() {
-        val test = service.findAllForUserID(UUID.fromString("b1805241-3365-455f-8ba9-6228458c55b0"))
-        Assertions.assertTrue(test.isNotEmpty())
+    fun `updateChallengeCounterForUserForType correctly updates current counter for challenge should return true`() {
+        val actual = this.service.updateChallengeCounterForUserForType(
+            UUID.fromString("b1805241-3365-455f-8ba9-6228458c55b0"),
+            Activity.ActivityType.DRINK_WATER
+        )
+
+        Assertions.assertTrue(actual.timesAWeekCurrent == 1)
     }
 }

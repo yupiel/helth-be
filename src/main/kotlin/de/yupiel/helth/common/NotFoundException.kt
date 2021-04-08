@@ -1,8 +1,6 @@
 package de.yupiel.helth.common
 
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-import java.lang.RuntimeException
+import org.springframework.web.client.HttpClientErrorException
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-class NotFoundException(message: String): RuntimeException(message)
+class NotFoundException(message: String): HttpClientErrorException(HttpStatus.NOT_FOUND, message)
