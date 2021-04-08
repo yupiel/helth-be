@@ -42,10 +42,13 @@ class ChallengeServiceTest {
 
     @Test
     fun `updateChallengeCounterForUserForType correctly updates current counter for challenge should return true`() {
-        val actual = this.service.updateChallengeCounterForUserForType(
+        this.service.updateChallengeCounterForUserForType(
             UUID.fromString("b1805241-3365-455f-8ba9-6228458c55b0"),
             Activity.ActivityType.DRINK_WATER
         )
+
+        val resultList = this.service.findAllForUserID(UUID.fromString("b1805241-3365-455f-8ba9-6228458c55b0"))
+        val actual = resultList.first {it.activityType == Activity.ActivityType.DRINK_WATER}
 
         Assertions.assertTrue(actual.timesAWeekCurrent == 1)
     }

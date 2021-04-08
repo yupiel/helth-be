@@ -35,7 +35,7 @@ internal class ActivityServiceTest {
         givenActivityExists("RUNNING", testUserID)
     }
 
-    private fun givenActivityExists(textType: String, userID: UUID): Activity? {
+    private fun givenActivityExists(textType: String, userID: UUID): Activity {
         return activityService.createActivity(userID, LocalDate.now(), textType)
     }
 
