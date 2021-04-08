@@ -3,6 +3,7 @@ package de.yupiel.helth.activity.application
 import de.yupiel.helth.activity.model.ActivityRepository
 import de.yupiel.helth.activity.model.Activity
 import de.yupiel.helth.challenge.application.ChallengeService
+import de.yupiel.helth.challenge.model.ChallengeRepository
 import de.yupiel.helth.common.NotFoundException
 import de.yupiel.helth.common.RequestBodyException
 import de.yupiel.helth.common.RequestParameterException
@@ -17,17 +18,19 @@ import java.util.*
 @DataJpaTest
 internal class ActivityServiceTest {
     @Autowired
-    private lateinit var repository: ActivityRepository
+    private lateinit var activityRepository: ActivityRepository
     @Autowired
-    private lateinit var challengeService: ChallengeService
+    private lateinit var challengeRepository: ChallengeRepository
 
+    private lateinit var challengeService: ChallengeService
     private lateinit var activityService: ActivityService
 
     private final val testUserID: UUID = UUID.fromString("c776e082-6407-49a5-a246-9d7265fc2583")
 
     @BeforeEach
     fun beforeEach() {
-        activityService = ActivityService(repository, challengeService)
+        challengeService = ChallengeService(challengeRepository)
+        activityService = ActivityService(activityRepository, challengeService)
 
         givenActivityExists("DRINK_WATER", testUserID)
         givenActivityExists("DRINK_WATER", testUserID)

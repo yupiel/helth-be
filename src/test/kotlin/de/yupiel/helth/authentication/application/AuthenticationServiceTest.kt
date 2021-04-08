@@ -73,6 +73,6 @@ internal class AuthenticationServiceTest {
         val validJWTAccessToken = service.generateJWTAccessToken(user.id, user.username)
 
         val actual = service.checkJWTTokenValidAndReturnPayload(validJWTAccessToken)
-        assertEquals(user.id.toString(), actual!!["user_id"])
+        assertEquals(user.id, actual.userID)
     }
 }

@@ -25,7 +25,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("com.beust:klaxon:5.5")
+    implementation("com.google.code.gson:gson:2.8.6")
     implementation("io.gatling:gatling-app:3.5.1")
 
     runtimeOnly("com.h2database:h2")

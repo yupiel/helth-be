@@ -1,6 +1,5 @@
 package de.yupiel.helth.user.application
 
-import de.yupiel.helth.authentication.application.AuthenticationService
 import de.yupiel.helth.user.model.UserRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
@@ -12,13 +11,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 internal class UserServiceTest {
     @Autowired
     private lateinit var repository: UserRepository
-    private lateinit var authenticationService: AuthenticationService
     private lateinit var userService: UserService
 
     @BeforeEach
     fun before() {
-        authenticationService = AuthenticationService(repository)
-        userService = UserService(repository, authenticationService)
+        userService = UserService(repository)
 
         userService.createUser("yupiel", "yeetyote")
     }
