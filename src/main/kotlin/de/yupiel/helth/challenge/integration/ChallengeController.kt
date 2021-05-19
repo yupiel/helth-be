@@ -20,7 +20,7 @@ class ChallengeController(
         return ChallengeDto.from(challenge)
     }
 
-    @GetMapping
+    //@GetMapping
     fun showAll(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestParam(required = false, value = "withUserID") userIDSearch: Boolean = false
@@ -37,16 +37,16 @@ class ChallengeController(
         }
     }
 
-    @GetMapping(params = ["startDate", "endDate"])
-    fun showActivitiesBetweenDates(
+    @GetMapping
+    fun showChallengesBetweenDates(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestParam(required = true, value = "startDate") startDate: String,
         @RequestParam(required = true, value = "endDate") endDate: String,
-        @RequestParam(required = false, value = "challengeStatus") challengeStatus: String
+        @RequestParam(required = false, value = "challengeStatus") challengeStatus: String?
     ): List<ChallengeDto> {
         val userID = this.authenticationService.extractUserIDFromAuthorizationHeader(authorizationHeader)
 
-        val challenges: List<Challenge> = if (challengeStatus.isEmpty()) {
+        val challenges: List<Challenge> = if (challengeStatus.isNullOrEmpty()) {
             this.challengeService.findBetweenDates(userID, startDate, endDate)
         } else {
             this.challengeService.findBetweenDatesWithStatus(userID, startDate, endDate, challengeStatus)
@@ -58,7 +58,7 @@ class ChallengeController(
     }
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun saveActivity(
+    fun saveChallenge(
         @RequestHeader("Authorization") authorizationHeader: String,
         @RequestBody request: ChallengeCreationRequest
     ): ChallengeDto {

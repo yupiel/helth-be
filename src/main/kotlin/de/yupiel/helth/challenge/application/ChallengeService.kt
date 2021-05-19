@@ -91,6 +91,8 @@ class ChallengeService(
         try {
             val activityTypeFromText = Activity.ActivityType.valueOf(activityType)
 
+            if(challengeOfGiveActivityTypeExistsForUser(userID, activityTypeFromText)) throw RequestBodyException("Only one challenge per Activity Type allowed")
+
             val newChallenge = Challenge(
                 activityTypeFromText,
                 timesAWeek,
@@ -134,6 +136,17 @@ class ChallengeService(
         }
 
         this.challengeRepository.saveAll(activeChallenges)
+    }
+
+    fun challengeOfGiveActivityTypeExistsForUser(userID: UUID, activityType: Activity.ActivityType): Boolean {
+        val challenges = this.challengeRepository.findChallengeByUserIDActivityTypeAndChallengeStatus(
+            userID,
+            activityType,
+            Challenge.ChallengeStatus.IN_PROGRESS
+        )
+
+        if(challenges.isEmpty()) return false
+        return true
     }
 
     fun deleteChallengesFromUserID(userID: UUID) {

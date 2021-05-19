@@ -11,6 +11,12 @@ import java.util.*
 class UserService(
     @Autowired private val userRepository: UserRepository
 ) {
+    fun getUserByID(userID: UUID): User {
+        val retrieved = this.userRepository.findById(userID)
+        if(retrieved.isEmpty) throw NotFoundException("User with id $userID does not exist")
+        else return retrieved.get()
+    }
+
     fun getAllUsers(): List<User> {
         val users = userRepository.findAll().toList()
         if (users.isEmpty()) throw NotFoundException("No Users found")

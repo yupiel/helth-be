@@ -25,7 +25,7 @@ interface ChallengeRepository : CrudRepository<Challenge, UUID> {
             SELECT c FROM Challenge c
             WHERE c.userID = :userID
             AND c.startDate >= :startDate
-            AND c.expirationDate <= :endDate 
+            AND c.startDate <= :endDate 
         """
     )
     fun findBetweenDates(
@@ -39,7 +39,7 @@ interface ChallengeRepository : CrudRepository<Challenge, UUID> {
             SELECT c FROM Challenge c
             WHERE c.userID = :userID
             AND c.startDate >= :startDate
-            AND c.expirationDate <= :endDate
+            AND c.startDate <= :endDate
             AND c.challengeStatus = :challengeStatus
         """
     )
