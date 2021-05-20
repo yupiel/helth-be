@@ -42,7 +42,6 @@ class Challenge(
     @Column(name = "user_id", nullable = false, unique = false)
     val userID: UUID = userID
 
-
     enum class ChallengeStatus {
         IN_PROGRESS,
         SUCCEEDED,

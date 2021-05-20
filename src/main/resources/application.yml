@@ -21,3 +21,15 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate.ddl-auto: update
+---
+spring.profiles: prod
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/helth
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: postgres
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate.ddl-auto: update

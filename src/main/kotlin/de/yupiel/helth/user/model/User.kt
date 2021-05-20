@@ -6,31 +6,25 @@ import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
+import javax.persistence.Table
 
 @Entity
+@Table(name="\"user\"")
 class User(username: String, password: String) {
     @Id
-    @Column(name = "id", nullable = false, unique = true, updatable = false)
-    var id: UUID
+    @Column(name = "id", unique = true, updatable = false)
+    var id: UUID = UUID.randomUUID()
         private set
     @Column(name = "username", nullable = false, unique = false)
-    var username: String
+    var username: String = username
         private set
     @Column(name = "password", nullable = false, unique = false)
-    var password: String
+    var password: String = password
         private set
-    @Column(name = "score", nullable = false, unique = false, columnDefinition = "VARCHAR")
-    var score: BigInteger
+    @Column(name = "score", nullable = false, unique = false, columnDefinition = "varchar")
+    var score: BigInteger = BigInteger("999999999")
         private set
     @Column(name = "creation_date", nullable = false, unique = false)
-    var creationDate: LocalDate
+    var creationDate: LocalDate = LocalDate.now()
         private set
-
-    init {
-        this.id = UUID.randomUUID()
-        this.username = username
-        this.password = password
-        this.score = BigInteger("9999999999999999999999999999999999999999999999")    //TODO add support in service and Controller
-        this.creationDate = LocalDate.now()
-    }
 }
