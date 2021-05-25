@@ -53,3 +53,15 @@ jobs:
           branch: main
           usedocker: true
           docker_heroku_process_type: web
+
+      - name: Docker Build & Push to Docker Hub
+        uses: opspresso/action-docker@master
+        with:
+          args: --docker
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_TOKEN }}
+          DOCKERFILE: Dockerfile
+          IMAGE_NAME: yupiel/helth-backend
+          TAG_NAME: latest
+          LATEST: true
