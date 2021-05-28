@@ -26,10 +26,10 @@ spring.profiles: prod
 
 spring:
   datasource:
-    url: jdbc:postgresql://helth-postgresql:5432/${POSTGRES_DB}
+    url:
     driverClassName: org.postgresql.Driver
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    username:
+    password:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate.ddl-auto: update
